@@ -13,6 +13,6 @@ if __name__ == "__main__":
     md.run()
 
     user_msg = ""
-    while user_msg != "/quit":
-        user_msg = input("Enter in patient description. To quit type \"/quit\" \n")
+    while True:
+        user_msg = input("Enter in patient description.\n")
         md.ask_question(user_msg)
