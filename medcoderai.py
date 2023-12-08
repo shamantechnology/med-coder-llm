@@ -228,7 +228,7 @@ class MedCoderAI:
                     pii_detected = True
                 
                 if feedback.name == "conciseness":
-                    conciseness = feedback_future.result
+                    conciseness = float(feedback_result.result)
         
         if pii_detected:
             return "I'm sorry but personal information was detected in your question. Please remove any personal information."

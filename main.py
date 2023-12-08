@@ -15,4 +15,5 @@ if __name__ == "__main__":
     user_msg = ""
     while True:
         user_msg = input("Enter in patient description.\n")
-        md.ask_question(user_msg)
+        ai_resp = md.ask_question(user_msg)
+        print(f"AI Reponse: {ai_resp}")
