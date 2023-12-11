@@ -13,8 +13,8 @@ from trulens_eval import Feedback, LiteLLM, Tru, TruChain, Huggingface
 from langchain.chat_models import ChatVertexAI
 from langchain.vectorstores import Weaviate
 from langchain.document_loaders import CSVLoader
-# from langchain.embeddings import VertexAIEmbeddings
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.embeddings import VertexAIEmbeddings
+# from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.memory import (
     ConversationBufferMemory,
     ConversationSummaryMemory
@@ -99,13 +99,13 @@ class MedCoderAI:
         print("Initilizing conversations and vectorstores")
         try:
             # start weaviate with schemas
-            # self.re_instantiate_weaviate()
+            self.re_instantiate_weaviate()
 
-            self.client = weaviate.Client(
-                url=os.getenv("WEAVIATE_CLUSTER_URL"),
-                auth_client_secret=weaviate.AuthApiKey(
-                    api_key=os.getenv("WEAVIATE_API_KEY"))
-            )
+            # self.client = weaviate.Client(
+            #     url=os.getenv("WEAVIATE_CLUSTER_URL"),
+            #     auth_client_secret=weaviate.AuthApiKey(
+            #         api_key=os.getenv("WEAVIATE_API_KEY"))
+            # )
         except Exception as err:
             print(f"failed to start weviate client: {err}")
             raise
@@ -116,25 +116,13 @@ class MedCoderAI:
             self.vectorstore = Weaviate.from_documents(
                 client=self.client, 
                 documents=self.code_docs, 
-                # embedding=VertexAIEmbeddings(), 
-                embedding=HuggingFaceEmbeddings(),
+                embedding=VertexAIEmbeddings(), 
+                # embedding=HuggingFaceEmbeddings(),
                 by_text=False
             )
         except Exception as err:
             print(f"failed to add docs to weaviate: {err}")
             raise
-
-        # setup question prompt and role
-        # prompt = ChatPromptTemplate(
-        #     messages=[
-        #         SystemMessagePromptTemplate.from_template(
-        #             self.ai_task
-        #         ),
-        #         # The `variable_name` here is what must align with memory
-        #         MessagesPlaceholder(variable_name="chat_history"),
-        #         HumanMessagePromptTemplate.from_template("{question}"),
-        #     ]
-        # )
 
         template = """
         You are Betsy who is a professional medical coder. 
@@ -148,13 +136,6 @@ class MedCoderAI:
         Chat History: {chat_history}
         -------------------------------"""
 
-        # Create the chat prompt templates
-        # qa_prompt = ChatPromptTemplate.from_messages(
-        #     [
-        #         ("system", system_template),
-        #         ("human", "{question}"),
-        #     ]
-        # )
         qa_prompt = PromptTemplate(
             input_variables=["context", "chat_history", "question"], 
             template=template
@@ -193,7 +174,7 @@ class MedCoderAI:
         tru = Tru()
         feedbacks = []
         
-        litellm_provider = LiteLLM(model_engine="palm/chat-bison")
+        litellm_provider = LiteLLM(model_engine="chat-bison")
         feedbacks.append(Feedback(litellm_provider.conciseness).on_output())
 
         hugs = Huggingface()
@@ -228,7 +209,7 @@ class MedCoderAI:
                     pii_detected = True
                 
                 if feedback.name == "conciseness":
-                    conciseness = float(feedback_result.result)
+                    conciseness = float(feedback_result.result) if feedback_result.result else 1.0
         
         if pii_detected:
             return "I'm sorry but personal information was detected in your question. Please remove any personal information."

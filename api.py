@@ -5,12 +5,13 @@ from flask import (
     make_response
 )
 
+from flask_cors import CORS
+
 from datetime import datetime
 from medcoderai import MedCoderAI
 
 app = Flask(__name__)
-
-
+CORS(app)
 
 @app.route("/rag", methods=["POST"])
 def rag():
@@ -21,7 +22,8 @@ def rag():
     """
 
     try:
-        user_msg = request.form("usermsg")
+        print(request)
+        user_msg = request.json["usermsg"]
         print(f"user_msg: {user_msg}")
 
         resp = md.ask_question(user_msg)
@@ -39,7 +41,7 @@ if __name__ == '__main__':
     md = MedCoderAI()
     md.run()
     print("Bringing up Flask RESTful Interface at localhost")
-    app.run(host="127.0.0.1", port=8080)
+    app.run(host="0.0.0.0", port=8080)
 
     
 
