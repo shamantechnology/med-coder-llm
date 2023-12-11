@@ -13,8 +13,8 @@ from trulens_eval import Feedback, LiteLLM, Tru, TruChain, Huggingface
 from langchain.chat_models import ChatVertexAI
 from langchain.vectorstores import Weaviate
 from langchain.document_loaders import CSVLoader
-from langchain.embeddings import VertexAIEmbeddings
-# from langchain.embeddings import HuggingFaceEmbeddings
+# from langchain.embeddings import VertexAIEmbeddings
+from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.memory import (
     ConversationBufferMemory,
     ConversationSummaryMemory
@@ -116,8 +116,8 @@ class MedCoderAI:
             self.vectorstore = Weaviate.from_documents(
                 client=self.client, 
                 documents=self.code_docs, 
-                embedding=VertexAIEmbeddings(), 
-                # embedding=HuggingFaceEmbeddings(),
+                # embedding=VertexAIEmbeddings(), 
+                embedding=HuggingFaceEmbeddings(),
                 by_text=False
             )
         except Exception as err:
